@@ -4,3 +4,31 @@
 @using MVC6.WebApplication.Models.ManageViewModels
 @using Microsoft.AspNetCore.Identity
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+@functions{
+    public string GetAntiXsrfRequestToken()
+    {
+        return Xsrf.GetAndStoreTokens(Context).RequestToken;
+    }
+}
+
+<script>
+    $("#antiforgery").click(function () {
+        $.ajax({
+            type: "post",
+            dataType: "html",
+            headers:
+            {
+                "RequestVerificationToken": '@GetAntiXsrfRequestToken()'
+            },
+            url: '@Url.Action("Antiforgery", "Home")',
+            success: function (result) {
+                alert(result);
+            },
+            error: function (err, scnd) {
+                alert(err.statusText);
+            }
+        });
+    });
+</script>

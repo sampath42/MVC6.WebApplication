@@ -12,6 +12,10 @@ using Microsoft.Extensions.Logging;
 using MVC6.WebApplication.Data;
 using MVC6.WebApplication.Models;
 using MVC6.WebApplication.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
 
 namespace MVC6.WebApplication
 {
@@ -55,14 +59,25 @@ namespace MVC6.WebApplication
 
             services.AddMemoryCache();
 
-            //services.AddDistributedRedisCache(options =>
-            //{
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = "localhost";
+                options.InstanceName = "MyInstance";
+            });
 
-            //});
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowOrigin1", builder => builder.WithOrigins("http://www.domain1.com"));
+                options.AddPolicy("AllowOrigin2", builder => builder.WithOrigins("http://www.domain2.com"));
+            });
 
-            services.AddMvc();
+            services.AddAntiforgery(options => options.HeaderName = "X-XSRF-TOKEN");
 
-            services.AddCors();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new CorsAuthorizationFilterFactory("AllowOrigin1"));
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -85,7 +100,8 @@ namespace MVC6.WebApplication
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IAntiforgery antiforgery)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -101,6 +117,10 @@ namespace MVC6.WebApplication
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            //app.UseCors(builder => builder.WithOrigins("http://www.google.com").AllowAnyHeader());            
+
+            app.UseCors("AllowOrigin1");
+
             app.UseStaticFiles();
 
             app.UseIdentity();
@@ -113,6 +133,21 @@ namespace MVC6.WebApplication
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            //app.Use(next => context =>
+            //{
+            //    string path = context.Request.Path.Value;
+            //    if(string.Equals(path,"/") || 
+            //    string.Equals(path,"/index.html",StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        var tokens = antiforgery.GetAndStoreTokens(context);
+            //        context.Response.Cookies.Append("XSRF-TOKEN", tokens.RequestToken, new CookieOptions()
+            //        {
+            //            HttpOnly = false
+            //        });
+            //    }
+            //    return next(context);
+            //});
         }
     }
 }

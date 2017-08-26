@@ -41,6 +41,7 @@ namespace MVC6.WebApplication
         public void ConfigureServices(IServiceCollection services)
         {
             _secret = Configuration["MySecret"];
+
             // Add framework services.
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -51,6 +52,13 @@ namespace MVC6.WebApplication
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddMemoryCache();
+
+            //services.AddDistributedRedisCache(options =>
+            //{
+
+            //});
 
             services.AddMvc();
 

@@ -1,4 +1,4 @@
-﻿{
+{
   "userSecretsId": "aspnet-MVC6.WebApplication-155e224a-7fd2-43b2-9b96-8cd8392ee87c",
 
   "dependencies": {
@@ -45,7 +45,9 @@
     "Microsoft.VisualStudio.Web.CodeGenerators.Mvc": {
       "version": "1.0.0-preview2-final",
       "type": "build"
-    }
+    },
+    "Microsoft.Azure.KeyVault": "2.3.2",
+    "Microsoft.IdentityModel.Clients.ActiveDirectory": "3.16.0"
   },
 
   "tools": {

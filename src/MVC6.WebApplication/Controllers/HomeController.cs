@@ -17,7 +17,8 @@ namespace MVC6.WebApplication.Controllers
 
         private string ClientId = "7b871190-3dae-459e-b777-ab4b6445411a";
         private string ClientSecret = "df3e8eaEc6zToSyeV3ZBE5yqjIurkc4dtwxpfwLifJk=";
-        private string KeyVaultBaseUrl = "https://keyvaultslearning.vault.azure.net/keys/AzureKeyVaultTest/f2df95a5ba884bb8890bddb0269c2a67";
+        private string KeyVaultBaseUrl = "https://keyvaultslearning.vault.azure.net/";
+        private string KeyVaultIdentifier= "https://keyvaultslearning.vault.azure.net/keys/AzureKeyVaultTest/f2df95a5ba884bb8890bddb0269c2a67";
         private string KeyName = "AzureKeyVaultTest";
 
         public HomeController(IMemoryCache cache)
@@ -34,8 +35,11 @@ namespace MVC6.WebApplication.Controllers
         public async Task<IActionResult> About()
         {
             var keyVaultClient = new KeyVaultClient(AuthenticateVault);
-            var result = await keyVaultClient.GetKeyAsync(KeyVaultBaseUrl);
-            var configKeys = result.Tags;
+            //var result = await keyVaultClient.GetKeyAsync(KeyVaultIdentifier);
+            //var configKeys = result.Tags;
+
+            var secretKeys = await keyVaultClient.GetSecretsAsync(KeyVaultBaseUrl);
+
             ViewData["Message"] = "Your application description page.";
 
             return View();
